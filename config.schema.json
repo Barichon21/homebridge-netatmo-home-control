@@ -1,0 +1,54 @@
+{
+  "pluginAlias": "NetatmoHomeControl",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Netatmo Home + Control",
+        "required": true
+      },
+      "client_id": {
+        "title": "Client ID",
+        "type": "string",
+        "required": true,
+        "description": "Your app's client_id from dev.netatmo.com"
+      },
+      "client_secret": {
+        "title": "Client Secret",
+        "type": "string",
+        "required": true,
+        "description": "Your app's client_secret from dev.netatmo.com"
+      },
+      "refresh_token": {
+        "title": "Refresh Token",
+        "type": "string",
+        "required": true,
+        "description": "OAuth2 refresh token. Run 'npx homebridge-netatmo-home-control auth' to obtain it."
+      },
+      "home_id": {
+        "title": "Home ID (optional)",
+        "type": "string",
+        "description": "Limit to a specific Netatmo home. Leave empty to include all homes."
+      },
+      "poll_interval": {
+        "title": "Poll Interval (seconds)",
+        "type": "integer",
+        "default": 30,
+        "minimum": 10,
+        "description": "How often to refresh device states from the Netatmo API."
+      }
+    }
+  },
+  "layout": [
+    "name",
+    "client_id",
+    "client_secret",
+    "refresh_token",
+    "home_id",
+    "poll_interval"
+  ]
+}
