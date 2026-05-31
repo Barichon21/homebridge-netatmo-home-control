@@ -8,25 +8,21 @@
       "name": {
         "title": "Name",
         "type": "string",
-        "default": "Netatmo Home + Control",
-        "required": true
+        "default": "Netatmo Home + Control"
       },
       "client_id": {
         "title": "Client ID",
         "type": "string",
-        "required": true,
         "description": "Your app's client_id from dev.netatmo.com"
       },
       "client_secret": {
         "title": "Client Secret",
         "type": "string",
-        "required": true,
         "description": "Your app's client_secret from dev.netatmo.com"
       },
       "refresh_token": {
         "title": "Refresh Token",
         "type": "string",
-        "required": true,
         "description": "OAuth2 refresh token. Run 'npx homebridge-netatmo-home-control auth' to obtain it."
       },
       "home_id": {
@@ -41,7 +37,8 @@
         "minimum": 10,
         "description": "How often to refresh device states from the Netatmo API."
       }
-    }
+    },
+    "required": ["name", "client_id", "client_secret", "refresh_token"]
   },
   "layout": [
     "name",
