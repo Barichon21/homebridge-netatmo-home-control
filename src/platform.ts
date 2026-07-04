@@ -171,7 +171,14 @@ export class NetatmoHomeControlPlatform implements DynamicPlatformPlugin {
 
   private async pollHome(homeId: string): Promise<void> {
     const status = await this.client.getHomeStatus(homeId);
-    for (const mod of status.body.home.modules) {
+    const modules = status.body?.home?.modules;
+    if (!Array.isArray(modules)) {
+      // Netatmo occasionally returns a 200 with a degraded body (no home/modules)
+      // during partial outages. Skip this cycle instead of throwing.
+      this.log.debug(`Skipping poll for home ${homeId}: no modules in homestatus response.`);
+      return;
+    }
+    for (const mod of modules) {
       const uuid = this.api.hap.uuid.generate(`${homeId}:${mod.id}`);
       const handler = this.handlers.get(uuid);
       if (!handler) continue;
