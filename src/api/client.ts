@@ -13,15 +13,24 @@ function extractApiError(err: unknown): string {
 }
 
 export class NetatmoClient {
-  constructor(private readonly auth: NetatmoAuth) {}
+  /**
+   * @param gatewayTypes Optional comma-separated Netatmo gateway/device types to
+   *   restrict discovery to (e.g. "NLG" for Legrand Home+Control). When empty,
+   *   no filter is sent so all gateway families are returned — including BTicino
+   *   MyHome (MyHomeServer1) whose gateway type is not "NLG".
+   */
+  constructor(
+    private readonly auth: NetatmoAuth,
+    private readonly gatewayTypes?: string,
+  ) {}
 
   async getHomesData(): Promise<HomesDataResponse> {
     const token = await this.auth.getAccessToken();
     try {
-      // Netatmo accepts Bearer header; also pass gateway_types to include Home+Control (NLG)
+      const params = this.gatewayTypes ? { gateway_types: this.gatewayTypes } : {};
       const resp = await axios.get<HomesDataResponse>(`${BASE}/homesdata`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { gateway_types: 'NLG' },
+        params,
       });
       return resp.data;
     } catch (err) {
@@ -32,9 +41,13 @@ export class NetatmoClient {
   async getHomeStatus(homeId: string): Promise<HomeStatusResponse> {
     const token = await this.auth.getAccessToken();
     try {
+      const params: Record<string, string> = { home_id: homeId };
+      if (this.gatewayTypes) {
+        params.device_types = this.gatewayTypes;
+      }
       const resp = await axios.get<HomeStatusResponse>(`${BASE}/homestatus`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { home_id: homeId, device_types: 'NLG' },
+        params,
       });
       return resp.data;
     } catch (err) {

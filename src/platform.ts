@@ -41,7 +41,18 @@ export class NetatmoHomeControlPlatform implements DynamicPlatformPlugin {
       config['client_secret'] as string,
       config['refresh_token'] as string,
     );
-    this.client = new NetatmoClient(auth);
+
+    // Optional gateway/device type filter. Accepts a comma-separated string or an
+    // array (e.g. "NLG" for Legrand only). When unset, no filter is applied so all
+    // gateway families are discovered — including BTicino MyHome (MyHomeServer1).
+    const rawGatewayTypes = config['gateway_types'] as string | string[] | undefined;
+    const gatewayTypes = Array.isArray(rawGatewayTypes)
+      ? rawGatewayTypes.join(',')
+      : (rawGatewayTypes?.trim() || undefined);
+    if (gatewayTypes) {
+      this.log.info(`Restricting discovery to gateway/device types: ${gatewayTypes}`);
+    }
+    this.client = new NetatmoClient(auth, gatewayTypes);
 
     this.api.on('didFinishLaunching', () => {
       this.discoverDevices().catch((err) => {

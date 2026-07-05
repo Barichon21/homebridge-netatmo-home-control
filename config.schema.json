@@ -36,6 +36,11 @@
         "default": 30,
         "minimum": 10,
         "description": "How often to refresh device states from the Netatmo API."
+      },
+      "gateway_types": {
+        "title": "Gateway Types (optional)",
+        "type": "string",
+        "description": "Comma-separated Netatmo gateway/device types to restrict discovery to (e.g. 'NLG' for Legrand Home+Control only). Leave empty to discover all gateway families, including BTicino MyHome (MyHomeServer1)."
       }
     },
     "required": ["name", "client_id", "client_secret", "refresh_token"]
@@ -46,6 +51,7 @@
     "client_secret",
     "refresh_token",
     "home_id",
-    "poll_interval"
+    "poll_interval",
+    "gateway_types"
   ]
 }
