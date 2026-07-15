@@ -40,6 +40,7 @@ export class NetatmoHomeControlPlatform implements DynamicPlatformPlugin {
       config['client_id'] as string,
       config['client_secret'] as string,
       config['refresh_token'] as string,
+      api.user.storagePath(),
     );
 
     // Optional gateway/device type filter. Accepts a comma-separated string or an

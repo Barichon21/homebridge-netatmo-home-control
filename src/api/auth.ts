@@ -4,12 +4,7 @@ import axios, { AxiosError } from 'axios';
 import type { NetatmoTokenResponse } from './types';
 
 const TOKEN_URL = 'https://api.netatmo.com/oauth2/token';
-// Cache file next to config.json — survives plugin reinstalls
-const TOKEN_CACHE = path.join(
-  process.env['HOME'] ?? '/root',
-  '.homebridge',
-  'netatmo-home-control-token.json',
-);
+const TOKEN_CACHE_FILE = 'netatmo-home-control-token.json';
 
 interface TokenCache {
   refresh_token: string;
@@ -19,12 +14,18 @@ export class NetatmoAuth {
   private accessToken = '';
   private tokenExpiry = 0;
   private refreshToken: string;
+  // Cache file inside the Homebridge storage directory — survives plugin
+  // reinstalls and works regardless of how Homebridge is installed (hb-service,
+  // custom -U path, etc.).
+  private readonly tokenCache: string;
 
   constructor(
     private readonly clientId: string,
     private readonly clientSecret: string,
     configRefreshToken: string,
+    storagePath: string,
   ) {
+    this.tokenCache = path.join(storagePath, TOKEN_CACHE_FILE);
     // Prefer the cached token (more recent) over the one in config.json
     this.refreshToken = this.loadCachedToken() ?? configRefreshToken;
   }
@@ -71,7 +72,7 @@ export class NetatmoAuth {
 
   private loadCachedToken(): string | null {
     try {
-      const raw = fs.readFileSync(TOKEN_CACHE, 'utf8');
+      const raw = fs.readFileSync(this.tokenCache, 'utf8');
       const data = JSON.parse(raw) as TokenCache;
       return data.refresh_token ?? null;
     } catch {
@@ -81,7 +82,7 @@ export class NetatmoAuth {
 
   private saveCachedToken(token: string): void {
     try {
-      fs.writeFileSync(TOKEN_CACHE, JSON.stringify({ refresh_token: token }, null, 2));
+      fs.writeFileSync(this.tokenCache, JSON.stringify({ refresh_token: token }, null, 2));
     } catch {
       // Non-fatal — token will be re-read from config.json next restart
     }
